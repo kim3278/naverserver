@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="spring_mybatis.EmpDAO">
+
+<select id="getOneEmp" resultType="empVO" parameterType="int">
+SELECT * FROM employees WHERE employee_id=#{employee_id} 
+</select>
+
+<select id="getAllEmp" resultType="empVO">
+select * from employees
+</select> 
+
+<select id="getPagingEmp" parameterType="int[]" resultType="empVO">
+SELECT employee_id, first_name, salary
+FROM (
+    SELECT @ROWNUM := @ROWNUM + 1 AS R, e.*
+    FROM employees e, (SELECT @ROWNUM := 0) R
+    order by hire_date
+) A
+where R between 
+	<foreach collection="array" item="num"  separator="and">
+	#{num}
+	</foreach>	 
+</select>
+
+<select id="checkEmp" parameterType="empVO" resultType="empVO">
+	select employee_id, email from employees 
+	where employee_id=#{employee_id} 
+	or email = #{email}
+</select>
+
+<select id="checkJob" parameterType="empVO" resultType="String">
+	select job_id from jobs 
+	where job_id=#{job_id} 
+</select>
+
+<insert id="insertEmp" parameterType="empVO">
+	INSERT INTO employees(employee_id, first_name, last_name, email, job_id, hire_date)
+	values(#{employee_id}, #{first_name}, #{last_name}, #{email}, #{job_id}, sysdate() )
+</insert>
+<!-- 
+<update id="updateEmp" parameterType="emp">
+update employees
+set first_name=#{first_name} 
+where employee_id=#{employee_id}
+</update>
+
+<delete id="deleteEmp" parameterType="int">
+ delete employees where employee_id=#{a}
+</delete> -->
+
+<!-- <select id="cnt" resultType="int">
+	select count(*) from employees
+</select> 
+ 
+ <select id="selectwithlist" parameterType="java.util.List" resultType="emp">
+ select employee_id, first_name, department_id
+ from employees
+ where department_id in
+  	<foreach collection="list" item="deptList"  open="(" separator="," close=")">
+	#{deptList}
+	</foreach>
+ </select>
+ 
+ <update id="updatewithmap" parameterType="java.util.Map">
+ update employees
+ set department_id=#{dept}, email =#{email}
+ where employee_id=
+ <if test="id == null">10</if>
+ <if test="id != null">#{id}</if>
+ </update> 
+ -->
+ 
+</mapper>
+
+
+
